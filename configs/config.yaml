@@ -1,0 +1,11 @@
+employee_data:
+  - first_name: Sridhar
+    department_id: 1
+  - first_name: Christian
+    department_id: 1
+  - first_name: Benoit
+    department_id: 2
+  - first_name: Thierry
+    department_id: 2
+  - first_name: bob
+    department_id: 100
