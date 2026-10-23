@@ -1,0 +1,40 @@
+name: Sync with config.yaml
+
+on:
+  push:
+    branches: [main]
+    paths: ["configs/config.yaml"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: snowflakedb/snowflake-actions@v3
+        with:
+          use-oidc: true
+          oidc-audience: https://${{ secrets.SNOWFLAKE_ACCOUNT }}.snowflakecomputing.com
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install snowflake-snowpark-python pyyaml
+
+      - name: Sync to Snowflake
+        env:
+          CONFIG_PATH:         configs/config.yaml
+          SNOWFLAKE_ACCOUNT:   ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_ROLE:      ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE:  ${{ secrets.SNOWFLAKE_DATABASE }}
+          SNOWFLAKE_SCHEMA:    ${{ secrets.SNOWFLAKE_SCHEMA }}
+        run: python scripts/4_Conjure_the_Script.py
